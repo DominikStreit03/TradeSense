@@ -10,9 +10,7 @@ public class Trade {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private Double amount;
-
     private Double buyIn;
     private Double sellOut;
     private String symbol;

@@ -35,20 +35,30 @@ public class TradesController {
         return "trade-statistics"; // Name der View (z.B. trade-statistics.html)
     }
 
+    @GetMapping("/trades/overview")
+    public String getTradeOverview(Model model) {
+        List<Trade> trades = tradesService.getAllTrades();
+        model.addAttribute("trades", trades);
+        return "trade-overview"; // Name der View (z.B. trade-statistics.html)
+    }
+
     @PostMapping("/trades")
     public String postTrade(@ModelAttribute Trade trade) {
         tradesService.saveTrade(trade);
         return "redirect:/trades";
     }
 
+//    public String uploadTradesExcel(@RequestParam("file") MultipartFile file, Model model) {
+
     @PostMapping("/trades/upload")
-    public String uploadTradesExcel(@RequestParam("file") MultipartFile file, Model model) {
-        try {
-            tradesService.importTradesFromExcel(file);
-            model.addAttribute("message", "Excel-Import erfolgreich!");
-        } catch (Exception e) {
-            model.addAttribute("message", "Fehler beim Import: " + e.getMessage());
-        }
+    public String uploadTradesExcel(Model model) {
+//     TODO: Re-add when import functionality is back
+//        try {
+//            tradesService.importTradesFromExcel(file);
+//            model.addAttribute("message", "Excel-Import erfolgreich!");
+//        } catch (Exception e) {
+//            model.addAttribute("message", "Fehler beim Import: " + e.getMessage());
+//        }
         return "redirect:/trades";
     }
 

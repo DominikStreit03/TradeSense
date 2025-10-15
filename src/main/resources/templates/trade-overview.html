@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Trades Übersicht</title>
+</head>
+<body>
+<!-- TODO Add bootstrap  -->
+
+<h1>Alle Trades</h1>
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Symbol</th>
+        <th>Amouint</th>
+        <th>Buy-In</th>
+        <th>Sell-Out</th>
+<!--        <th>Zeitpunkt</th>-->
+    </tr>
+    <tr th:each="trade : ${trades}">
+        <td th:text="${trade.id}"></td>
+        <td th:text="${trade.symbol}"></td>
+        <td th:text="${trade.amount}"></td>
+        <td th:text="${trade.buyIn}"></td>
+        <td th:text="${trade.sellOut}"></td>
+<!--        <td th:text="${trade.tradeTime}"></td>-->
+    </tr>
+</table>
+
+</body>
+</html>
