@@ -1,5 +1,7 @@
 package de.model.trade;
 
+import de.model.trade.rating.TradeLevel;
+import de.model.trade.rating.TradeWinLoss;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -28,6 +30,10 @@ public class Trade {
     private Double profitLoss;
 
     private LocalDateTime timestamp;
+
+    private TradeWinLoss winLoss;
+
+    private TradeLevel tradeLevel;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "trade_tags", joinColumns = @JoinColumn(name = "trade_id"))
@@ -134,6 +140,22 @@ public class Trade {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public TradeWinLoss getWinLoss() {
+        return winLoss;
+    }
+
+    public void setWinLoss(TradeWinLoss winLoss) {
+        this.winLoss = winLoss;
+    }
+
+    public TradeLevel getTradeLevel() {
+        return tradeLevel;
+    }
+
+    public void setTradeLevel(TradeLevel tradeLevel) {
+        this.tradeLevel = tradeLevel;
     }
 
     // equals / hashCode based on id when available, otherwise on business key
