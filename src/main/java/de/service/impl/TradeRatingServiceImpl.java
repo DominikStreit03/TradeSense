@@ -44,24 +44,18 @@ public class TradeRatingServiceImpl implements TradeRatingService {
         double profit = trade.getProfitLoss() != null ? trade.getProfitLoss() :
                 (trade.getExitPrice() - trade.getEntryPrice()) * trade.getQuantity();
 
-        // Negative profit = risky
-        if (profit <= 0) return TradeLevel.RISKY;
+        double profitRatio = profit / (trade.getEntryPrice() * trade.getQuantity());
 
-        double quantityFactor = Math.log10(trade.getQuantity() + 1);
-        double riskFactor = estimateRisk(trade.getEntryPrice(), trade.getExitPrice(), trade.getQuantity());
-
-        // Weighted score
-        double score = normalizeProfit(profit) * 0.6 + normalizeQuantity(quantityFactor) * 0.3 + (1 - riskFactor) * 0.1;
-
-        // Map to 1-5
-        int rating = Math.min(5, Math.max(1, (int) Math.ceil(score * 5)));
-
-        switch (rating) {
-            case 5: return TradeLevel.EXCELLENT;
-            case 4: return TradeLevel.GOOD;
-            case 3: return TradeLevel.OKAY;
-            case 2: return TradeLevel.CAUTIOUS;
-            default: return TradeLevel.RISKY;
+        if (profitRatio > 0.6 && trade.getQuantity() >= 15) {
+            return TradeLevel.EXCELLENT;
+        } else if (profitRatio > 0.2 && trade.getQuantity() >= 5) {
+            return TradeLevel.GOOD;
+        } else if (profitRatio > 0.05) {
+            return TradeLevel.OKAY;
+        } else if (profitRatio > 0) {
+            return TradeLevel.CAUTIOUS;
+        } else {
+            return TradeLevel.RISKY;
         }
     }
 
