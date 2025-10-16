@@ -1,9 +1,12 @@
 package de.service;
 
-import de.model.Trade;
+import de.model.trade.Trade;
 import java.util.List;
+
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+@Component
 public interface TradesService {
     List<Trade> getAllTrades();
     Trade saveTrade(Trade trade);

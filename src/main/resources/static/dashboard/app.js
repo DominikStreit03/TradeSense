@@ -64,16 +64,13 @@ function App() {
     const tableRowAltBg = "#252525";    // Alternative Zeilen
 
     return (
-        React.createElement("div", {
-            style: {
-                padding: 16,
-                fontFamily: "Arial, sans-serif",
-                backgroundColor: bgColor,
-                color: textColor,
-                minHeight: "100vh",
-                margin: 0
-            }
-        },
+        React.useEffect(() => {
+            document.body.style.backgroundColor = "#121212"; // Hintergrund dunkel
+            document.body.style.color = "#e0e0e0";           // Schrift hell
+            document.body.style.margin = "0";                // Browser-Rand weg
+            document.body.style.padding = "0";
+        }, []);
+        React.createElement("div", { style: { padding: 16, fontFamily: "Arial", backgroundColor: "#1e1e1e", color: "#e0e0e0" } },
             React.createElement("h1", null, "TradeSense Dashboard"),
             React.createElement("form", { onSubmit: handleUpload, style: { marginBottom: 16 } },
                 React.createElement("label", null, "Datei (CSV/XLSX): ",

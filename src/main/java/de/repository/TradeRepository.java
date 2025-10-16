@@ -1,6 +1,6 @@
 package de.repository;
 
-import de.model.Trade;
+import de.model.trade.Trade;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

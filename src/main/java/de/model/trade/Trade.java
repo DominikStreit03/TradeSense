@@ -1,4 +1,4 @@
-package de.model;
+package de.model.trade;
 
 import jakarta.persistence.*;
 
@@ -44,7 +44,7 @@ public class Trade {
     // Convenience constructor
     public Trade(String symbol, Double entryPrice, Double exitPrice, Double quantity, Double profitLoss, LocalDateTime timestamp, Set<String> tags, String notes) {
         this.symbol = symbol;
-        this.entryPrice = entryPrice;
+        this.   entryPrice = entryPrice;
         this.exitPrice = exitPrice;
         this.quantity = quantity;
         this.profitLoss = profitLoss;

@@ -1,6 +1,6 @@
 package de.service.impl;
 
-import de.model.Trade;
+import de.model.trade.Trade;
 import de.repository.TradeRepository;
 import de.service.TradesService;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -15,9 +15,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -113,28 +111,21 @@ public class TradesServiceImpl implements TradesService {
 
     @Override
     public void importTradesFromCsv(MultipartFile file) throws Exception {
-        // CSV-Format expected (Header): symbol,entryPrice,exitPrice,quantity,profitLoss,timestamp,tags,notes
-        // timestamp im ISO_LOCAL_DATE_TIME Format z.B. 2023-08-01T15:30:00
         Set<String> uniqueKeys = new HashSet<>();
-        List<Trade> existingTrades = tradeRepository.findAll();
-        for (Trade t : existingTrades) {
-            if (t.getSymbol() != null && t.getEntryPrice() != null && t.getTimestamp() != null) {
-                uniqueKeys.add(t.getSymbol() + ":" + t.getEntryPrice() + ":" + t.getTimestamp().toString());
-            }
-        }
-
-        DateTimeFormatter dtf = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
             String headerLine = br.readLine();
             if (headerLine == null) {
-                logger.warn("Retrieve empty CSV-File.");
+                logger.warn("CSV-File is empty");
                 return;
             }
+
+            // Header-Mapping
             String[] headers = headerLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
             Map<String, Integer> idx = new HashMap<>();
             for (int i = 0; i < headers.length; i++) {
-                idx.put(headers[i].trim().replaceAll("\"", ""), i);
+                idx.put(headers[i].trim().replaceAll("\"", "").toLowerCase(), i);
             }
 
             String line;
@@ -142,20 +133,19 @@ public class TradesServiceImpl implements TradesService {
             while ((line = br.readLine()) != null) {
                 rowNum++;
                 try {
-                    // Split with CSV-safe regex
                     String[] tokens = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
+
                     String symbol = getByIndex(tokens, idx.get("symbol"));
-                    Double entryPrice = parseDouble(getByIndex(tokens, idx.get("entryPrice")));
-                    Double exitPrice = parseDouble(getByIndex(tokens, idx.get("exitPrice")));
+                    Double entryPrice = parseDouble(getByIndex(tokens, idx.get("entryprice")));
+                    Double exitPrice = parseDouble(getByIndex(tokens, idx.get("exitprice")));
                     Double quantity = parseDouble(getByIndex(tokens, idx.get("quantity")));
-                    Double profitLoss = parseDouble(getByIndex(tokens, idx.get("profitLoss")));
                     String timestampStr = getByIndex(tokens, idx.get("timestamp"));
                     LocalDateTime timestamp = null;
+
                     if (timestampStr != null && !timestampStr.isEmpty()) {
                         try {
                             timestamp = LocalDateTime.parse(timestampStr, dtf);
                         } catch (Exception ex) {
-                            // Fallback: try space-separated pattern
                             try {
                                 timestamp = LocalDateTime.parse(timestampStr.replace(" ", "T"), dtf);
                             } catch (Exception ex2) {
@@ -166,12 +156,13 @@ public class TradesServiceImpl implements TradesService {
                         timestamp = LocalDateTime.now();
                     }
 
-                    // Compute profitLoss if not provided and other fields available
+                    // Profit/Loss berechnen, wenn nicht vorhanden
+                    Double profitLoss = parseDouble(getByIndex(tokens, idx.get("profitloss")));
                     if (profitLoss == null && entryPrice != null && exitPrice != null && quantity != null) {
                         profitLoss = (exitPrice - entryPrice) * quantity;
                     }
 
-                    // Tags separated by ; or ,
+                    // Tags verarbeiten
                     String tagsRaw = getByIndex(tokens, idx.get("tags"));
                     Set<String> tags = new HashSet<>();
                     if (tagsRaw != null && !tagsRaw.isEmpty()) {
@@ -187,6 +178,7 @@ public class TradesServiceImpl implements TradesService {
                         notes = notes.replaceAll("^\"|\"$", "");
                     }
 
+                    // Einzigartigkeit prüfen
                     String key = symbol + ":" + (entryPrice != null ? entryPrice.toString() : "null") + ":" + timestamp.toString();
                     if (!uniqueKeys.contains(key)) {
                         Trade trade = new Trade();
@@ -198,6 +190,7 @@ public class TradesServiceImpl implements TradesService {
                         trade.setTimestamp(timestamp);
                         trade.setTags(tags);
                         trade.setNotes(notes);
+
                         tradeRepository.save(trade);
                         uniqueKeys.add(key);
                         logger.info("CSV-Trade saved (row {}): {}", rowNum, key);
