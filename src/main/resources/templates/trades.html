@@ -8,7 +8,7 @@
 <!-- TODO Add bootstrap  -->
 
 <h2>Neuen Trade anlegen</h2>
-<form th:action="@{/trades}" method="post">
+<form th:action="@{/api/trades/upload}" method="post">
     <label>Symbol: <input type="text" name="symbol" required></label><br>
     <label>Amount: <input type="number" step="0.01" name="amount" required></label><br>
     <label>Buy-In: <input type="number" step="0.01" name="buyIn" required></label><br>

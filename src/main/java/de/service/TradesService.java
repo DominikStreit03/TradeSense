@@ -8,4 +8,6 @@ public interface TradesService {
     List<Trade> getAllTrades();
     Trade saveTrade(Trade trade);
     void importTradesFromExcel(MultipartFile file) throws Exception;
+    void importTradesFromCsv(MultipartFile file) throws Exception;
+
 }

@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TradeRepository extends JpaRepository<Trade, Long> {
-    // Zusätzliche Query-Methoden können hier definiert werden
+    // CRUD-Methoden über JpaRepository verfügbar.
+    // weitere querry methoden können hier definiert werden
 }
-
